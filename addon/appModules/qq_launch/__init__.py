@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 
-
+import UIAHandler
 import conversationListView
 import messageListBox
 import api
@@ -9,7 +9,6 @@ import appModuleHandler
 import controlTypes
 import ui
 from logHandler import log
-from scriptHandler import script
 from NVDAObjects.UIA import UIA
 
 
@@ -30,10 +29,11 @@ class AppModule(appModuleHandler.AppModule):
 			
 		elif isinstance(obj,UIA) and obj.role==controlTypes.ROLE_BUTTON :
 			clsList.insert(0,messageListBox.MessageToolButton)
-
-
 	def event_NVDAObject_init(self,obj):
-
-		pass
-
-
+		if isinstance(obj, UIA):
+			try:
+				res = obj._getUIACacheablePropertyValue(UIAHandler.UIA_IsVirtualizedItemPatternAvailablePropertyId)
+			except COMError:
+				res = False
+			if res and obj.children:
+				obj.name = obj.children[0].name
